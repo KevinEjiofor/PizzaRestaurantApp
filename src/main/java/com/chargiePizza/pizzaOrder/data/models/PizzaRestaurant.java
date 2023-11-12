@@ -20,5 +20,9 @@ public class PizzaRestaurant{
     private String restaurantPassword;
     @DBRef
     private List<PizzaMenu> menu;
+
+    @DBRef
+    private List<OrderMenu> customerOrderMenu;
+
     private boolean isLock;
 }

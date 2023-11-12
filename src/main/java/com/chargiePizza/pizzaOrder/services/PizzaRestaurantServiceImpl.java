@@ -1,6 +1,6 @@
 package com.chargiePizza.pizzaOrder.services;
 
-import com.chargiePizza.pizzaOrder.data.models.Order;
+import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
@@ -10,9 +10,9 @@ import com.chargiePizza.pizzaOrder.expections.PizzaRestaurantAlreadyExistsExcept
 
 import com.chargiePizza.pizzaOrder.expections.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.chargiePizza.pizzaOrder.utils.mapper.map;
@@ -22,6 +22,7 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
 
     @Autowired
     private PizzaRestaurantRepository pizzaRestaurantRepository;
+
     @Autowired
     private PizzaMenuService pizzaMenuService;
 
@@ -64,36 +65,41 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
     @Override
     public void removePizzaNameFromMenu(RemovePizzaMenuRequest removePizzaMenuRequest) {
         PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(removePizzaMenuRequest.getRestaurantName());
-     PizzaMenu pizzaMenu = pizzaMenuService.findPizzaMenu(removePizzaMenuRequest, pizzaRestaurant);
+     PizzaMenu pizzaMenu = pizzaMenuService.findPizzaMenu(removePizzaMenuRequest.getPizzaMenuName(), pizzaRestaurant);
 
      pizzaMenuService.remove(pizzaMenu);
 
     }
 
-    @Override
-    public List<PizzaMenu> getFullMenu(GetFullMenuRequest request) {
-        return null;
-    }
 
+    public String getFullMenu(String restaurantName) {
 
-    @Override
-    public PizzaMenu updatePizzaMenu(AddMenuListRequest menuList) {
-        return null;
-    }
-
-
-    @Override
-    public void receiveOrder() {
+         getPizzaRestaurant(restaurantName);
+        return pizzaMenuService.getFullMenu();
 
     }
 
+
     @Override
-    public void updateOrder() {
+    public void updatePizzaMenu(UpdateMenuRequest updateMenuRequest) {
+        PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(updateMenuRequest.getPizzaRestaurantName());
+        PizzaMenu pizzaMenu = pizzaMenuService.findPizzaMenu(updateMenuRequest.getPizzaName(), pizzaRestaurant);
+
+
+        pizzaMenuService.updatePizzaMenu(updateMenuRequest,pizzaMenu);
+    }
+
+
+
+    @Override
+    public void receiveOrder(OrderMenu orderMenu) {
 
     }
 
+
+
     @Override
-    public boolean dispatchOrder(Order order) {
+    public boolean dispatchOrder(OrderMenu order) {
         return false;
     }
 
@@ -103,10 +109,13 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
 
         }
     }
-    private PizzaRestaurant getPizzaRestaurant(String pizzaRestaurantName) {
+    public PizzaRestaurant getPizzaRestaurant(String pizzaRestaurantName) {
         Optional<PizzaRestaurant> pizzaRestaurant =
                 pizzaRestaurantRepository.findPizzaRestaurantByRestaurantNameIgnoreCase(pizzaRestaurantName);
         if(pizzaRestaurant.isEmpty()) throw new RestaurantNotFoundException("Pizza Restaurant Not Found");
         return pizzaRestaurant.get();
     }
+
+
+
 }

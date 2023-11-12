@@ -25,11 +25,15 @@ public class PizzaMenu {
 
     @Override
     public String toString() {
-        return  "Pizza Menu:" +
-                pizzaName + '\n' +
-                "Pizza Size :'" + pizzaSize + '\n' +
-                "Pizza Price :" + pizzaPrice + '\n' +
-                "Drink Name :" + drinkName + '\n' +
-                "Drink Price :" + drinkPrice ;
+
+
+        return  "Pizza Menu"+'\n' +
+               "Pizza name : " + pizzaName + '\n' +
+                "Pizza Size : " + pizzaSize + '\n' +
+                "Pizza Price : " + pizzaPrice + '\n' +
+                "Drink Name : " + drinkName + '\n' +
+                "Drink Price : " + drinkPrice +'\n'+
+                '\n';
+
     }
 }

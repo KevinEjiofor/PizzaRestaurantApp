@@ -17,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -31,56 +33,47 @@ class PizzaRestaurantServiceImplTest {
 
     @Autowired
     private PizzaMenuRepository pizzaMenuRepository;
-
+    @Autowired
+    private  PizzaMenuService pizzaMenuService;
     @BeforeEach
     public void deleteBeforeEachTest(){
         pizzaRestaurantRepository.deleteAll();
         pizzaMenuRepository.deleteAll();
+
+        RegisterUserRequest request = new RegisterUserRequest();
+        request.setUsername("chargiePizza");
+        request.setPassword("word");
+        pizzaRestaurantService.registerRestaurant(request);
     }
 
     @Test
     public void testPizzaShopCanRegister(){
-        RegisterUserRequest request = new RegisterUserRequest();
 
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
         assertThat(pizzaRestaurantRepository.count(), is(1L));
 
     }
 
     @Test
     public void testForPizzaRestaurantDoesNotHaveTheSameRestaurantName(){
-        RegisterUserRequest request = new RegisterUserRequest();
 
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
         assertThat(pizzaRestaurantRepository.count(), is(1L));
 
         RegisterUserRequest request2 = new RegisterUserRequest();
         request2.setUsername("chargiePizza");
-        request.setPassword("word");
+        request2.setPassword("word");
 
         assertThrows(PizzaRestaurantAlreadyExistsException.class,()->pizzaRestaurantService.registerRestaurant(request2));
 
     }
 
     @Test
-    public void testForPizzaRestaurantDoesNotHaveTheSameRestaurantNameAndEvenWhenIsADifferentCasing(){
-        RegisterUserRequest request = new RegisterUserRequest();
+    public void testForPizzaRestaurantDoesNotHaveTheSameRestaurantNameAndEvenWhenTheLetterCasingIsDifferent(){
 
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
         assertThat(pizzaRestaurantRepository.count(), is(1L));
 
         RegisterUserRequest request2 = new RegisterUserRequest();
         request2.setUsername("ChargiePizza");
-        request.setPassword("word");
+        request2.setPassword("word");
 
         assertThrows(PizzaRestaurantAlreadyExistsException.class,()->pizzaRestaurantService.registerRestaurant(request2));
         assertThat(pizzaRestaurantRepository.count(), is(1L));
@@ -88,13 +81,8 @@ class PizzaRestaurantServiceImplTest {
     }
 
     @Test public void testLogInForRestaurant(){
-        PizzaRestaurant pizza = new PizzaRestaurant();
-        RegisterUserRequest request = new RegisterUserRequest();
+        PizzaRestaurant pizzaRestaurant = new PizzaRestaurant();
 
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
 
 
         LogInRequest logInRequest = new LogInRequest();
@@ -103,7 +91,7 @@ class PizzaRestaurantServiceImplTest {
 
         pizzaRestaurantService.unlock(logInRequest);
 
-        assertFalse(pizza.isLock());
+        assertFalse(pizzaRestaurant.isLock());
 
     }
 
@@ -112,21 +100,14 @@ class PizzaRestaurantServiceImplTest {
     public void testToLogInUnregisterRestaurant(){
 
         LogInRequest logInRequest = new LogInRequest();
-        logInRequest.setUsername("chargiePizza");
+        logInRequest.setUsername("chargie");
         logInRequest.setPassword("word");
 
        assertThrows(InvalidPasswordException.class,()-> pizzaRestaurantService.unlock(logInRequest));
     }
 
     @Test
-    public void testToLoginWithDetails(){
-
-        RegisterUserRequest request = new RegisterUserRequest();
-
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
+    public void testToLoginWithWrongDetails(){;
 
 
         LogInRequest logInRequest = new LogInRequest();
@@ -140,10 +121,6 @@ class PizzaRestaurantServiceImplTest {
 
     @Test
     public void testToAddToMenu() {
-        RegisterUserRequest request = new RegisterUserRequest();
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-        pizzaRestaurantService.registerRestaurant(request);
 
         AddMenuListRequest  menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
@@ -159,10 +136,7 @@ class PizzaRestaurantServiceImplTest {
 
     @Test
     public void testToAddDifferentPizzaToMenu() {
-        RegisterUserRequest request = new RegisterUserRequest();
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-        pizzaRestaurantService.registerRestaurant(request);
+
 
         AddMenuListRequest  menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
@@ -186,6 +160,7 @@ class PizzaRestaurantServiceImplTest {
 
         assertThat(pizzaMenuRepository.count(), is(2L));
     }
+
     @Test
     public void testToAddPizzaMenuToUnRegisterRestaurant(){
 
@@ -201,10 +176,7 @@ class PizzaRestaurantServiceImplTest {
 
     @Test
     public void testToRemoveFromTheMenu(){
-        RegisterUserRequest request = new RegisterUserRequest();
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-        pizzaRestaurantService.registerRestaurant(request);
+
 
         AddMenuListRequest  menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
@@ -229,10 +201,7 @@ class PizzaRestaurantServiceImplTest {
     }
     @Test
     public void testRemoveFromTheMenu() {
-        RegisterUserRequest request = new RegisterUserRequest();
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-        pizzaRestaurantService.registerRestaurant(request);
+
 
         AddMenuListRequest  menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
@@ -254,11 +223,8 @@ class PizzaRestaurantServiceImplTest {
 
 
     @Test
-    public void testRemoveForCaseSensitivity(){
-        RegisterUserRequest request = new RegisterUserRequest();
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-        pizzaRestaurantService.registerRestaurant(request);
+    public void testRemoveMethodForCaseSensitivity(){
+
 
         AddMenuListRequest  menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
@@ -280,12 +246,7 @@ class PizzaRestaurantServiceImplTest {
     }
 
     @Test
-    public void testForExceptionPizzaNameAndRestaurant(){
-        RegisterUserRequest request = new RegisterUserRequest();
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
+    public void testForExceptionForWrongPizzaNameAndRestaurant(){
 
         AddMenuListRequest  menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
@@ -307,6 +268,96 @@ class PizzaRestaurantServiceImplTest {
 
 
 
+    @Test
+    public void testToUpdateMenu() {
+
+        AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
+        menuList.setPizzaName("Margherita Pizza");
+        menuList.setPizzaSize("small");
+        menuList.setPizzaAmount(BigDecimal.valueOf(10));
+        pizzaRestaurantService.addPizzaMenu(menuList);
+
+        UpdateMenuRequest updateRequest = new UpdateMenuRequest();
+        updateRequest.setPizzaRestaurantName("chargiePizza");
+        updateRequest.setPizzaName("Margherita Pizza");
+        updateRequest.setNewPizzaSize("large");
+        updateRequest.setNewPizzaAmount(BigDecimal.valueOf(20));
+        pizzaRestaurantService.updatePizzaMenu(updateRequest);
+
+        PizzaMenu updatedPizzaMenu = pizzaMenuService.findPizzaMenu("Margherita Pizza", getPizzaRestaurantForTest(updateRequest.getPizzaRestaurantName()));
+
+
+        assertNotNull(updatedPizzaMenu);
+        assertEquals("large", updatedPizzaMenu.getPizzaSize());
+        assertEquals(BigDecimal.valueOf(20), updatedPizzaMenu.getPizzaPrice());
+    }
+    
+    @Test
+    public void testUpdatePizzaExceptions(){
+
+
+        UpdateMenuRequest updateRequest = new UpdateMenuRequest();
+        updateRequest.setPizzaRestaurantName("chargiePizza");
+        updateRequest.setPizzaName("Margherita Pizza");
+        updateRequest.setNewPizzaSize("large");
+        updateRequest.setNewPizzaAmount(BigDecimal.valueOf(20));
+
+
+        assertThrows(MenuNotFoundException.class,()->pizzaRestaurantService.updatePizzaMenu(updateRequest));
+
+
+    }
+
+
+
+    @Test
+    public void testToGetFullMenu() {
+        AddMenuListRequest menuItem1 = new AddMenuListRequest();
+        menuItem1.setPizzaRestaurantName("chargiePizza");
+        menuItem1.setPizzaName("BBQ Chicken Pizza");
+        menuItem1.setPizzaSize("Large");
+        menuItem1.setPizzaAmount(BigDecimal.valueOf(10));
+        pizzaRestaurantService.addPizzaMenu(menuItem1);
+
+        AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
+        menuList.setPizzaName("Margherita Pizza");
+        menuList.setPizzaSize("small");
+        menuList.setDrinkName("Coke");
+        menuList.setDrinkPrice(BigDecimal.valueOf(100));
+        menuList.setPizzaAmount(BigDecimal.valueOf(10));
+        pizzaRestaurantService.addPizzaMenu(menuList);
+        assertThat(pizzaMenuRepository.count(), is(2L));
+
+
+        String expected =  "Pizza Menu"+'\n' +
+                "Pizza name : " + menuItem1.getPizzaName()+ '\n' +
+                "Pizza Size : " + menuItem1.getPizzaSize() + '\n' +
+                "Pizza Price : " + menuItem1.getPizzaAmount() + '\n' +
+                "Drink Name : " + menuItem1.getDrinkName()+ '\n' +
+                "Drink Price : " + menuItem1.getDrinkPrice() +'\n'+
+                '\n'+
+                "Pizza Menu"+'\n' +
+                "Pizza name : " + menuList.getPizzaName()+ '\n' +
+                "Pizza Size : " + menuList.getPizzaSize() + '\n' +
+                "Pizza Price : " + menuList.getPizzaAmount() + '\n' +
+                "Drink Name : " + menuList.getDrinkName()+ '\n' +
+                "Drink Price : " + menuList.getDrinkPrice() +'\n'+
+                '\n';
+
+
+
+
+
+
+        assertEquals(expected, pizzaRestaurantService.getFullMenu("chargiePizza"));
+    }
+    @Test public void testForEmptyMenu() {
+
+        assertThrows(MenuNotFoundException.class,()->pizzaRestaurantService.getFullMenu("chargiePizza"));
+
+    }
 
 
 
@@ -315,7 +366,10 @@ class PizzaRestaurantServiceImplTest {
 
 
 
-
+    private PizzaRestaurant getPizzaRestaurantForTest(String restaurantName) {
+        Optional<PizzaRestaurant> pizzaRestaurantOptional = pizzaRestaurantRepository.findPizzaRestaurantByRestaurantNameIgnoreCase(restaurantName);
+        return pizzaRestaurantOptional.orElseThrow(() -> new RestaurantNotFoundException("Pizza Restaurant Not Found"));
+    }
 
 
 }

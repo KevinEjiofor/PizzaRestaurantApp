@@ -6,7 +6,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
+import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
+import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
 import com.chargiePizza.pizzaOrder.dtos.*;
+import com.chargiePizza.pizzaOrder.expections.MenuNotFoundException;
 import org.mockito.Mockito;
 
 
@@ -36,33 +39,47 @@ class CustomerServiceImplTest {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+
     @Autowired
     private PizzaRestaurantService pizzaRestaurantService;
+    @Autowired
+    private PizzaRestaurantRepository pizzaRestaurantRepository;
+
+    @Autowired
+    private PizzaMenuRepository pizzaMenuRepository;
 
 
     @BeforeEach
     public void setUp() {
         customerRepository.deleteAll();
+        pizzaRestaurantRepository.deleteAll();
+        pizzaMenuRepository.deleteAll();
+
+
+
+        RegisterUserRequest request = new RegisterUserRequest();
+
+        request.setUsername("chargiePizza");
+        request.setPassword("word");
+
+        pizzaRestaurantService.registerRestaurant(request);
+
+        CustomerRegisterUserRequest userRequest = new CustomerRegisterUserRequest();
+        userRequest.setCustomerEmail("Kevin@yahoo.com");
+        userRequest.setCustomerName("Ejiro Kompany");
+        userRequest.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
+        userRequest.setCustomerUserName("EjiroKompany");
+        customerService.registerCustomer(userRequest);
     }
 
     @Test
     public void testToRegisterACustomer(){
-        CustomerRegisterUserRequest userRequest = new CustomerRegisterUserRequest();
-        userRequest.setCustomerEmail("Kevin@yahoo.com");
-        userRequest.setCustomerName("Ejiro Kompany");
-        userRequest.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
-        userRequest.setCustomerUserName("EjiroKompany");
-        customerService.registerCustomer(userRequest);
+
 
         assertThat(customerRepository.count(),is(1L));
     }
     @Test public void testForCustomerRegistrationForTwoUsers(){
-        CustomerRegisterUserRequest userRequest = new CustomerRegisterUserRequest();
-        userRequest.setCustomerEmail("Kevin@yahoo.com");
-        userRequest.setCustomerName("Ejiro Kompany");
-        userRequest.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
-        userRequest.setCustomerUserName("EjiroKompany");
-        customerService.registerCustomer(userRequest);
 
         CustomerRegisterUserRequest userRequest1 = new CustomerRegisterUserRequest();
         userRequest1.setCustomerEmail("Kevin@yahoo.com");
@@ -75,12 +92,6 @@ class CustomerServiceImplTest {
 
     }
     @Test public void testForUniqueName(){
-        CustomerRegisterUserRequest userRequest = new CustomerRegisterUserRequest();
-        userRequest.setCustomerEmail("Kevin@yahoo.com");
-        userRequest.setCustomerName("Ejiro Kompany");
-        userRequest.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
-        userRequest.setCustomerUserName("EjiroKompany");
-        customerService.registerCustomer(userRequest);
 
         CustomerRegisterUserRequest userRequest1 = new CustomerRegisterUserRequest();
         userRequest1.setCustomerEmail("Kevin@yahoo.com");
@@ -121,13 +132,6 @@ class CustomerServiceImplTest {
         assertThrows(UserAlreadyExistException.class,()->customerService.unlock(logInRequest));
     }
     @Test public void testForWrongPasswordAndUserNameLogin() {
-        CustomerRegisterUserRequest userRequest = new CustomerRegisterUserRequest();
-        userRequest.setCustomerEmail("Kevin@yahoo.com");
-        userRequest.setCustomerName("Ejiro Kompany");
-        userRequest.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
-        userRequest.setCustomerUserName("EjiroKompany");
-        userRequest.setCustomerPassword("NSG");
-        customerService.registerCustomer(userRequest);
 
         LogInRequest logInRequest = new LogInRequest();
         logInRequest.setUsername("Don");
@@ -153,32 +157,56 @@ class CustomerServiceImplTest {
 
     }
 
+
     @Test
     public void testCustomerCanGetFullMenuList() {
 
-        RegisterUserRequest request = new RegisterUserRequest();
-
-        request.setUsername("chargiePizza");
-        request.setPassword("word");
-
-        pizzaRestaurantService.registerRestaurant(request);
-
         AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
         menuList.setPizzaName("Margherita Pizza");
         menuList.setPizzaSize("small");
         menuList.setPizzaAmount(BigDecimal.valueOf(10));
-
-        GetFullMenuRequest menuListRequest = new GetFullMenuRequest();
-        menuListRequest.setPizzaRestaurantName("chargiePizza");
-        menuListRequest.setPizzaMenuName("Margherita");
+        pizzaRestaurantService.addPizzaMenu(menuList);
 
 
-        List<PizzaMenu> menu = customerService.menu(menuListRequest);
+        String expected = "Pizza Menu" + '\n' +
+                "Pizza name : " + menuList.getPizzaName() + '\n' +
+                "Pizza Size : " + menuList.getPizzaSize() + '\n' +
+                "Pizza Price : " + menuList.getPizzaAmount() + '\n' +
+                "Drink Name : " + menuList.getDrinkName() + '\n' +
+                "Drink Price : " + menuList.getDrinkPrice() + '\n' +
+                '\n';
 
-
-        assertThat(menu.size(), is(1));
+        assertEquals(expected, customerService.menu("chargiePizza"));
+    }
+    @Test public void testForExceptions(){
+        assertThrows(MenuNotFoundException.class,()->customerService.menu("chargiePizza"));
     }
 
+    @Test
+    public void testToOrder(){
+        AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
+        menuList.setPizzaName("Margherita Pizza");
+        menuList.setPizzaSize("small");
+        menuList.setPizzaAmount(BigDecimal.valueOf(10));
+        menuList.setDrinkName("Coke");
+        menuList.setDrinkPrice(BigDecimal.valueOf(100));
+        pizzaRestaurantService.addPizzaMenu(menuList);
+
+        OrderProductRequest orderProduct = new OrderProductRequest();
+        orderProduct.setPizzaName("Margherita Pizza");
+        orderProduct.setPizzaSize("small");
+        orderProduct.setNumberOfPizza(3);
+        orderProduct.setDrinks("Coke");
+        orderProduct.setNumberOfDrinks(1);
+
+        customerService.addOrderProduct(orderProduct);
+
+
+
+
+    }
 
 
 

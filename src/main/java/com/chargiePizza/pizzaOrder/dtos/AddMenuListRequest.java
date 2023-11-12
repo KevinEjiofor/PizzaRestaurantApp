@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class AddMenuListRequest {
+
     private String pizzaName;
     private String pizzaSize;
     private BigDecimal pizzaAmount;

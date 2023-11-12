@@ -1,11 +1,10 @@
 package com.chargiePizza.pizzaOrder.utils;
 
 import com.chargiePizza.pizzaOrder.data.models.Customer;
+import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
-import com.chargiePizza.pizzaOrder.dtos.AddMenuListRequest;
-import com.chargiePizza.pizzaOrder.dtos.CustomerRegisterUserRequest;
-import com.chargiePizza.pizzaOrder.dtos.RegisterUserRequest;
+import com.chargiePizza.pizzaOrder.dtos.*;
 
 public class mapper {
     public static PizzaRestaurant map(RegisterUserRequest userRequest){
@@ -29,6 +28,7 @@ public class mapper {
     }
     public static PizzaMenu map(AddMenuListRequest menuList){
         PizzaMenu menu = new PizzaMenu();
+
         menu.setPizzaName(menuList.getPizzaName());
         menu.setPizzaSize(menuList.getPizzaSize());
         menu.setPizzaPrice(menuList.getPizzaAmount());
@@ -37,6 +37,25 @@ public class mapper {
 
         return menu;
     }
+
+    public static PizzaMenu map(UpdateMenuRequest updateMenuRequest, PizzaMenu existingPizzaMenu) {
+        existingPizzaMenu.setPizzaPrice(updateMenuRequest.getNewPizzaAmount());
+        existingPizzaMenu.setDrinkPrice(updateMenuRequest.getNewDrinkAmount());
+        existingPizzaMenu.setPizzaSize(updateMenuRequest.getNewPizzaSize());
+
+
+        return existingPizzaMenu;
+    }
+public static OrderMenu map(OrderProductRequest orderRequest){
+        OrderMenu orderMenu = new OrderMenu();
+        orderMenu.setPizzaName(orderRequest.getPizzaName());
+        orderMenu.setPizzaSize(orderRequest.getPizzaSize());
+        orderMenu.setNumberOfPizza(orderRequest.getNumberOfPizza());
+        orderMenu.setDrinks(orderRequest.getDrinks());
+        orderMenu.setNumberOfDrinks(orderRequest.getNumberOfDrinks());
+return orderMenu;
+}
+
 
 
 }

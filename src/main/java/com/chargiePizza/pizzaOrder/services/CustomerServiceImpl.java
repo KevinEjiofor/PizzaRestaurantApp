@@ -1,33 +1,30 @@
 package com.chargiePizza.pizzaOrder.services;
 
 import com.chargiePizza.pizzaOrder.data.models.Customer;
-import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
+import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
 import com.chargiePizza.pizzaOrder.data.repositories.CustomerRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
 import com.chargiePizza.pizzaOrder.dtos.CustomerRegisterUserRequest;
-import com.chargiePizza.pizzaOrder.dtos.GetFullMenuRequest;
 import com.chargiePizza.pizzaOrder.dtos.LogInRequest;
-import com.chargiePizza.pizzaOrder.dtos.PizzaRestaurantNameRequest;
+import com.chargiePizza.pizzaOrder.dtos.OrderProductRequest;
 import com.chargiePizza.pizzaOrder.expections.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.chargiePizza.pizzaOrder.utils.mapper.map;
-
 @Service
 public class CustomerServiceImpl implements CustomerService {
-    @Autowired
-    private PizzaRestaurantRepository pizzaRestaurantRepository;
+
 
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private PizzaRestaurantService pizzaRestaurantService;
+
+    @Autowired
+    private OrderMenuService orderMenuService;
 
     @Override
     public void registerCustomer(CustomerRegisterUserRequest registerUserRequest) {
@@ -58,31 +55,28 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<PizzaMenu> menu(GetFullMenuRequest request) {
-        return  pizzaRestaurantService.getFullMenu(request);
+    public String menu(String restaurantName) {
+        return pizzaRestaurantService.getFullMenu(restaurantName);
+    }
 
+    @Override
+    public void addOrderProduct(OrderProductRequest orderProduct) {
+        OrderMenu orderMenu  = map(orderProduct);
+        orderMenu.setCustomerName(getCustomer(orderProduct.getCustomerName()));
+        orderMenuService.addOrder(orderMenu);
+        pizzaRestaurantService.receiveOrder(orderMenu);
 
     }
 
-//    static List<PizzaMenu> getAll(PizzaMenuRe pizzaMenu) {
-//        List<PizzaMenu> fullMenu = pizzaMenu.findAll();
-//
-//        if (fullMenu.isEmpty()) {
-//            throw new MenuNotFoundException("The menu is currently empty.");
-//        } else {
-//
-//            return fullMenu;
-//
-//        }
-//    }
 
 
-    private void validateRestaurantUniqueName(String restaurantName) {
-        if (pizzaRestaurantRepository.findPizzaRestaurantByRestaurantNameIgnoreCase(restaurantName).isPresent()) {
-            throw new PizzaRestaurantAlreadyExistsException("Pizza Restaurant Already Exists");
-
-        }
+    private Customer getCustomer(String customerName) {
+        Optional<Customer> customer =
+                customerRepository.findCustomerByCustomerUserName(customerName);
+        if(customer.isEmpty()) throw new RestaurantNotFoundException("User name not correct");
+        return customer.get();
     }
+
 
     private void validateUniqueUsername(String customerName) {
         if (customerRepository.findCustomerByCustomerUserName(customerName).isPresent()) {

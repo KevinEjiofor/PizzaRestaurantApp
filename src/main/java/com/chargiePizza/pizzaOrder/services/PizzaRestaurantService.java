@@ -1,10 +1,7 @@
 package com.chargiePizza.pizzaOrder.services;
 
-import com.chargiePizza.pizzaOrder.data.models.Order;
-import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
+import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.dtos.*;
-
-import java.util.List;
 
 public interface PizzaRestaurantService {
     void registerRestaurant(RegisterUserRequest registerUserRequest);
@@ -17,15 +14,16 @@ public interface PizzaRestaurantService {
 
     void removePizzaNameFromMenu(RemovePizzaMenuRequest removePizzaMenuRequest);
 
-    List<PizzaMenu> getFullMenu(GetFullMenuRequest request);
+    String getFullMenu(String restaurantName);
 
-    PizzaMenu updatePizzaMenu(AddMenuListRequest menuList);
+    void updatePizzaMenu(UpdateMenuRequest updateMenuRequest);
 
-    void receiveOrder();
 
-    void updateOrder();
 
-    boolean dispatchOrder(Order order);
+    void receiveOrder(OrderMenu orderMenu);
+
+
+    boolean dispatchOrder(OrderMenu order);
 
 
 
