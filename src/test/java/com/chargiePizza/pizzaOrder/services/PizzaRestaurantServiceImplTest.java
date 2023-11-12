@@ -1,7 +1,9 @@
 package com.chargiePizza.pizzaOrder.services;
 
+import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
+import com.chargiePizza.pizzaOrder.data.repositories.CustomerRepository;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
 import com.chargiePizza.pizzaOrder.dtos.*;
@@ -35,10 +37,17 @@ class PizzaRestaurantServiceImplTest {
     private PizzaMenuRepository pizzaMenuRepository;
     @Autowired
     private  PizzaMenuService pizzaMenuService;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private CustomerRepository customerRepository;
+
+
     @BeforeEach
     public void deleteBeforeEachTest(){
         pizzaRestaurantRepository.deleteAll();
         pizzaMenuRepository.deleteAll();
+        customerRepository.deleteAll();
 
         RegisterUserRequest request = new RegisterUserRequest();
         request.setUsername("chargiePizza");
@@ -354,17 +363,9 @@ class PizzaRestaurantServiceImplTest {
         assertEquals(expected, pizzaRestaurantService.getFullMenu("chargiePizza"));
     }
     @Test public void testForEmptyMenu() {
-
         assertThrows(MenuNotFoundException.class,()->pizzaRestaurantService.getFullMenu("chargiePizza"));
 
     }
-
-
-
-
-
-
-
 
     private PizzaRestaurant getPizzaRestaurantForTest(String restaurantName) {
         Optional<PizzaRestaurant> pizzaRestaurantOptional = pizzaRestaurantRepository.findPizzaRestaurantByRestaurantNameIgnoreCase(restaurantName);
@@ -372,4 +373,41 @@ class PizzaRestaurantServiceImplTest {
     }
 
 
+    @Test public void testThatPizzaRestaurantReceivedOrder(){
+        AddMenuListRequest menuItem1 = new AddMenuListRequest();
+        menuItem1.setPizzaRestaurantName("chargiePizza");
+        menuItem1.setPizzaName("BBQ Chicken Pizza");
+        menuItem1.setPizzaSize("Large");
+        menuItem1.setPizzaAmount(BigDecimal.valueOf(10));
+        pizzaRestaurantService.addPizzaMenu(menuItem1);
+
+        CustomerRegisterUserRequest userRequest1 = new CustomerRegisterUserRequest();
+        userRequest1.setCustomerEmail("Kevin@yahoo.com");
+        userRequest1.setCustomerName("Kompany");
+        userRequest1.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
+        userRequest1.setCustomerUserName("Kompany");
+        customerService.registerCustomer(userRequest1);
+
+        OrderProductRequest orderProduct = new OrderProductRequest();
+        orderProduct.setOrderName("order1");
+        orderProduct.setCustomerName("Kompany");
+        orderProduct.setPizzaName("Margherita Pizza");
+        orderProduct.setPizzaSize("small");
+        orderProduct.setNumberOfPizza(3);
+        orderProduct.setDrinks("Coke");
+        orderProduct.setNumberOfDrinks(1);
+        orderProduct.setPizzaRestaurantName("chargiePizza");
+        customerService.addOrderProduct(orderProduct);
+
+        CheckMenuRequest checkRequest = new CheckMenuRequest();
+        checkRequest.setPiazzaRestaurant("chargiePizza");
+        List<OrderMenu> orderMenuList = pizzaRestaurantService.checkOrderMenuList(checkRequest);
+
+        assertThat(orderMenuList.size(), is(1L));
+
+
+
+
+
+    }
 }

@@ -12,7 +12,9 @@ import com.chargiePizza.pizzaOrder.expections.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.chargiePizza.pizzaOrder.utils.mapper.map;
@@ -25,6 +27,8 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
 
     @Autowired
     private PizzaMenuService pizzaMenuService;
+    @Autowired
+    private OrderMenuService  orderMenuService;
 
     @Override
     public void registerRestaurant(RegisterUserRequest registerUserRequest) {
@@ -93,9 +97,21 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
 
     @Override
     public void receiveOrder(OrderMenu orderMenu) {
+        PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(orderMenu.getPizzaRestaurant().getRestaurantName());
+        OrderMenu order = orderMenuService.findOrder(orderMenu.getOrderName(), pizzaRestaurant);
+        pizzaMenuService.findPizzaMenu(order.getPizzaName(), pizzaRestaurant);
 
+        List<OrderMenu> orderMenuList = pizzaRestaurant.getCustomerOrderMenu();
+        orderMenuList.add(order);
+        pizzaRestaurant.setCustomerOrderMenu(orderMenuList);
+        pizzaRestaurantRepository.save(pizzaRestaurant);
     }
 
+    @Override
+    public List<OrderMenu> checkOrderMenuList(CheckMenuRequest request) {
+        PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(request.getPiazzaRestaurant());
+        return pizzaRestaurant.getCustomerOrderMenu();
+    }
 
 
     @Override
@@ -109,6 +125,8 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
 
         }
     }
+
+    @Override
     public PizzaRestaurant getPizzaRestaurant(String pizzaRestaurantName) {
         Optional<PizzaRestaurant> pizzaRestaurant =
                 pizzaRestaurantRepository.findPizzaRestaurantByRestaurantNameIgnoreCase(pizzaRestaurantName);

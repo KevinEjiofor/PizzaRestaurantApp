@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
+import com.chargiePizza.pizzaOrder.data.repositories.OrderMenuRepository;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
 import com.chargiePizza.pizzaOrder.dtos.*;
@@ -46,6 +47,8 @@ class CustomerServiceImplTest {
     @Autowired
     private PizzaRestaurantRepository pizzaRestaurantRepository;
 
+    @Autowired private OrderMenuRepository  orderMenuRep;
+
     @Autowired
     private PizzaMenuRepository pizzaMenuRepository;
 
@@ -55,6 +58,7 @@ class CustomerServiceImplTest {
         customerRepository.deleteAll();
         pizzaRestaurantRepository.deleteAll();
         pizzaMenuRepository.deleteAll();
+        orderMenuRep.deleteAll();
 
 
 
@@ -195,6 +199,9 @@ class CustomerServiceImplTest {
         pizzaRestaurantService.addPizzaMenu(menuList);
 
         OrderProductRequest orderProduct = new OrderProductRequest();
+        orderProduct.setOrderName("Order1");
+        orderProduct.setPizzaRestaurantName("chargiePizza");
+        orderProduct.setCustomerName("EjiroKompany");
         orderProduct.setPizzaName("Margherita Pizza");
         orderProduct.setPizzaSize("small");
         orderProduct.setNumberOfPizza(3);
@@ -202,6 +209,9 @@ class CustomerServiceImplTest {
         orderProduct.setNumberOfDrinks(1);
 
         customerService.addOrderProduct(orderProduct);
+
+        assertThat(orderMenuRep.count(),is(1L));
+
 
 
 

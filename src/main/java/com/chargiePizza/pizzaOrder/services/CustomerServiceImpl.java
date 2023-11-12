@@ -63,6 +63,8 @@ public class CustomerServiceImpl implements CustomerService {
     public void addOrderProduct(OrderProductRequest orderProduct) {
         OrderMenu orderMenu  = map(orderProduct);
         orderMenu.setCustomerName(getCustomer(orderProduct.getCustomerName()));
+        PizzaRestaurant pizzaRestaurant = pizzaRestaurantService.getPizzaRestaurant(orderProduct.getPizzaRestaurantName());
+        orderMenu.setPizzaRestaurant(pizzaRestaurant);
         orderMenuService.addOrder(orderMenu);
         pizzaRestaurantService.receiveOrder(orderMenu);
 
@@ -73,7 +75,7 @@ public class CustomerServiceImpl implements CustomerService {
     private Customer getCustomer(String customerName) {
         Optional<Customer> customer =
                 customerRepository.findCustomerByCustomerUserName(customerName);
-        if(customer.isEmpty()) throw new RestaurantNotFoundException("User name not correct");
+        if(customer.isEmpty()) throw new CustomerNotFoundException("User name not correct");
         return customer.get();
     }
 

@@ -44,15 +44,10 @@ public class PizzaMenuServiceImpl implements PizzaMenuService{
     public String getFullMenu() {
         List<PizzaMenu> menuItems = pizzaMenuRepository.findAll();
         StringBuilder fullMenu = new StringBuilder();
-
         if(menuItems.isEmpty()) throw new MenuNotFoundException("Pizza Menu is Empty");
-
-
         for (PizzaMenu menuItem : menuItems) {
             fullMenu.append(menuItem.toString());
-
         }
-
         return  fullMenu.toString();
     }
 
