@@ -48,6 +48,7 @@ public class mapper {
     }
 public static OrderMenu map(OrderProductRequest orderRequest){
         OrderMenu orderMenu = new OrderMenu();
+        orderMenu.setOrderName(orderRequest.getOrderName());
         orderMenu.setPizzaName(orderRequest.getPizzaName());
         orderMenu.setPizzaSize(orderRequest.getPizzaSize());
         orderMenu.setNumberOfPizza(orderRequest.getNumberOfPizza());

@@ -7,6 +7,7 @@ import com.chargiePizza.pizzaOrder.data.repositories.CustomerRepository;
 import com.chargiePizza.pizzaOrder.dtos.CustomerRegisterUserRequest;
 import com.chargiePizza.pizzaOrder.dtos.LogInRequest;
 import com.chargiePizza.pizzaOrder.dtos.OrderProductRequest;
+import com.chargiePizza.pizzaOrder.dtos.RemoveOrderRequest;
 import com.chargiePizza.pizzaOrder.expections.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,17 @@ public class CustomerServiceImpl implements CustomerService {
 
 
 
+    @Override
+    public void removeOrder(RemoveOrderRequest orderRequest) {
+
+        Customer customer = getCustomer(orderRequest.getCustomerName());
+        pizzaRestaurantService.getPizzaRestaurant(orderRequest.getPizzaRestaurantName());
+        OrderMenu orderMenu = orderMenuService.findOrderMenu(orderRequest.getOrderName(),customer);
+        orderMenuService.removeOrder(orderMenu);
+
+    }
+
+
     private Customer getCustomer(String customerName) {
         Optional<Customer> customer =
                 customerRepository.findCustomerByCustomerUserName(customerName);
@@ -82,7 +94,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private void validateUniqueUsername(String customerName) {
         if (customerRepository.findCustomerByCustomerUserName(customerName).isPresent()) {
-            throw new UserAlreadyExistException("USERNAME IS ALREADY EXIST");
+            throw new UserAlreadyExistException("USERNAME ALREADY EXIST");
 
         }
     }

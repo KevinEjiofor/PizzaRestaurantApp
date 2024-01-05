@@ -1,5 +1,6 @@
 package com.chargiePizza.pizzaOrder.services;
 
+import com.chargiePizza.pizzaOrder.data.models.Customer;
 import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
 import com.chargiePizza.pizzaOrder.data.repositories.OrderMenuRepository;
@@ -23,7 +24,7 @@ public class OrderMenuServiceImpl implements OrderMenuService {
 
     @Override
     public void removeOrder(OrderMenu order) {
-
+        orderRepository.delete(order);
     }
 
     @Override
@@ -37,7 +38,24 @@ public class OrderMenuServiceImpl implements OrderMenuService {
                 .findOrderMenuByOrderNameAndPizzaRestaurant(orderName, pizzaRestaurant);
         if(orderMenu.isEmpty()) throw new OrderNotFoundException("Order Not Found");
         return orderMenu.get();
+
+
     }
+
+    @Override
+    public OrderMenu findOrderMenu(String orderName, Customer customer) {
+        Optional<OrderMenu> orderMenu = orderRepository.
+                findOrderMenuByOrderNameAndCustomerName(orderName, customer);
+        if(orderMenu.isEmpty()) throw new OrderNotFoundException("Order Not Found");
+        return orderMenu.get();
+    }
+
+//    @Override
+//    public OrderMenu findOrderMenu(String orderName, Customer customer) {
+//        Optional<OrderMenu> orderMenu = orderRepository.findOrderMenuByOrderNameAndCustomerName(orderName, customer);
+//        if (orderMenu.isEmpty()) throw new OrderNotFoundException("Order Not On your list");
+//        return orderMenu.get();
+//    }
 
 
 }

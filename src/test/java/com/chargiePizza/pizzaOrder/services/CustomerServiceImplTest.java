@@ -212,13 +212,78 @@ class CustomerServiceImplTest {
 
         assertThat(orderMenuRep.count(),is(1L));
 
+    }
 
+    @Test
+    public void  testToOrderForItemNotOnTheMenu(){
+
+        AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
+        menuList.setPizzaName("Margherita Pizza");
+        menuList.setPizzaSize("small");
+        menuList.setPizzaAmount(BigDecimal.valueOf(10));
+        menuList.setDrinkName("Coke");
+        menuList.setDrinkPrice(BigDecimal.valueOf(100));
+        pizzaRestaurantService.addPizzaMenu(menuList);
+
+        OrderProductRequest orderProduct = new OrderProductRequest();
+        orderProduct.setOrderName("Order1");
+        orderProduct.setPizzaRestaurantName("chargiePizza");
+        orderProduct.setCustomerName("EjiroKompany");
+        orderProduct.setPizzaName("Pizza");
+        orderProduct.setPizzaSize("small");
+        orderProduct.setNumberOfPizza(3);
+        orderProduct.setDrinks("Fanta");
+        orderProduct.setNumberOfDrinks(1);
+
+        assertThrows(MenuNotFoundException.class,()->customerService.addOrderProduct(orderProduct));
+    }
+
+    @Test
+    public void testToRemoveOrder(){
+        AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
+        menuList.setPizzaName("Margherita Pizza");
+        menuList.setPizzaSize("small");
+        menuList.setPizzaAmount(BigDecimal.valueOf(10));
+        menuList.setDrinkName("Coke");
+        menuList.setDrinkPrice(BigDecimal.valueOf(100));
+        pizzaRestaurantService.addPizzaMenu(menuList);
+
+        OrderProductRequest orderProduct = new OrderProductRequest();
+        orderProduct.setOrderName("Order1");
+        orderProduct.setPizzaRestaurantName("chargiePizza");
+        orderProduct.setCustomerName("EjiroKompany");
+        orderProduct.setPizzaName("Margherita Pizza");
+        orderProduct.setPizzaSize("small");
+        orderProduct.setNumberOfPizza(3);
+        orderProduct.setDrinks("Coke");
+        orderProduct.setNumberOfDrinks(1);
+
+        customerService.addOrderProduct(orderProduct);
+
+        assertThat(orderMenuRep.count(),is(1L));
+
+
+        RemoveOrderRequest orderRequest = new RemoveOrderRequest();
+        orderRequest.setOrderName("Order1");
+        orderRequest.setPizzaRestaurantName("chargiePizza");
+        orderRequest.setCustomerName("EjiroKompany");
+        orderRequest.setPizzaName("Margherita Pizza");
+        orderRequest.setPizzaSize("small");
+        orderRequest.setNumberOfPizza(3);
+        orderRequest.setDrinks("Coke");
+        orderRequest.setNumberOfDrinks(1);
+
+        pizzaRestaurantService.removeOrderRequest(orderRequest);
+        customerService.removeOrder(orderRequest);
+
+
+        assertThat(orderMenuRep.count(),is(0L));
 
 
 
     }
-
-
 
 
 

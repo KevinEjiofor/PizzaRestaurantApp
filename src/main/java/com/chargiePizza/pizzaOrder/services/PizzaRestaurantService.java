@@ -31,4 +31,5 @@ public interface PizzaRestaurantService {
     List<OrderMenu> checkOrderMenuList(CheckMenuRequest request);
 
 
+    void removeOrderRequest(RemoveOrderRequest orderRequest);
 }

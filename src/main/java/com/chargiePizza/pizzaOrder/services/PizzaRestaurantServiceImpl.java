@@ -14,6 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,9 +70,10 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
     @Override
     public void removePizzaNameFromMenu(RemovePizzaMenuRequest removePizzaMenuRequest) {
         PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(removePizzaMenuRequest.getRestaurantName());
-     PizzaMenu pizzaMenu = pizzaMenuService.findPizzaMenu(removePizzaMenuRequest.getPizzaMenuName(), pizzaRestaurant);
+        PizzaMenu pizzaMenu = pizzaMenuService.findPizzaMenu(removePizzaMenuRequest.getPizzaMenuName(), pizzaRestaurant);
 
-     pizzaMenuService.remove(pizzaMenu);
+
+        pizzaMenuService.remove(pizzaMenu);
 
     }
 
@@ -95,22 +97,50 @@ public class PizzaRestaurantServiceImpl implements PizzaRestaurantService {
 
 
 
-    @Override
-    public void receiveOrder(OrderMenu orderMenu) {
-        PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(orderMenu.getPizzaRestaurant().getRestaurantName());
-        OrderMenu order = orderMenuService.findOrder(orderMenu.getOrderName(), pizzaRestaurant);
-        pizzaMenuService.findPizzaMenu(order.getPizzaName(), pizzaRestaurant);
+@Override
+public void receiveOrder(OrderMenu orderMenu) {
+    PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(orderMenu.getPizzaRestaurant().getRestaurantName());
+    OrderMenu order = orderMenuService.findOrder(orderMenu.getOrderName(), pizzaRestaurant);
+    pizzaMenuService.findPizzaMenu(order.getPizzaName(), pizzaRestaurant);
 
-        List<OrderMenu> orderMenuList = pizzaRestaurant.getCustomerOrderMenu();
-        orderMenuList.add(order);
-        pizzaRestaurant.setCustomerOrderMenu(orderMenuList);
-        pizzaRestaurantRepository.save(pizzaRestaurant);
+
+    List<OrderMenu> orderMenuList = pizzaRestaurant.getCustomerOrderMenu();
+    if (orderMenuList == null) {
+        orderMenuList = new ArrayList<>();
     }
+
+
+    orderMenuList.add(order);
+    pizzaRestaurant.setCustomerOrderMenu(orderMenuList);
+    pizzaRestaurantRepository.save(pizzaRestaurant);
+}
+
 
     @Override
     public List<OrderMenu> checkOrderMenuList(CheckMenuRequest request) {
         PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(request.getPiazzaRestaurant());
         return pizzaRestaurant.getCustomerOrderMenu();
+    }
+
+    @Override
+    public void removeOrderRequest(RemoveOrderRequest orderRequest) {
+        PizzaRestaurant pizzaRestaurant = getPizzaRestaurant(orderRequest.getPizzaRestaurantName());
+        List<OrderMenu>  customerOrderMenu = pizzaRestaurant.getCustomerOrderMenu();
+        System.out.println(customerOrderMenu.toString());
+        System.out.println(orderRequest.getOrderName());
+        OrderMenu orderMenu = null;
+        for (OrderMenu customerOrder : customerOrderMenu){
+            if(orderRequest.getOrderName().equals(customerOrder.getOrderName())){
+                orderMenu = customerOrder;
+                System.out.println("found customer order");
+            }
+        }
+
+
+        customerOrderMenu.remove(orderMenu);
+        pizzaRestaurant.setCustomerOrderMenu(customerOrderMenu);
+        pizzaRestaurantRepository.save(pizzaRestaurant);
+
     }
 
 

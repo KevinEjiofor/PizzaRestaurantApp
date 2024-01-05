@@ -4,6 +4,7 @@ import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
 import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
 import com.chargiePizza.pizzaOrder.data.repositories.CustomerRepository;
+import com.chargiePizza.pizzaOrder.data.repositories.OrderMenuRepository;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
 import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
 import com.chargiePizza.pizzaOrder.dtos.*;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,6 +43,8 @@ class PizzaRestaurantServiceImplTest {
     private CustomerService customerService;
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private OrderMenuRepository orderMenuRepository;
 
 
     @BeforeEach
@@ -48,6 +52,7 @@ class PizzaRestaurantServiceImplTest {
         pizzaRestaurantRepository.deleteAll();
         pizzaMenuRepository.deleteAll();
         customerRepository.deleteAll();
+        orderMenuRepository.deleteAll();
 
         RegisterUserRequest request = new RegisterUserRequest();
         request.setUsername("chargiePizza");
@@ -202,9 +207,12 @@ class PizzaRestaurantServiceImplTest {
         menuItem1.setPizzaAmount(BigDecimal.valueOf(10));
         pizzaRestaurantService.addPizzaMenu(menuItem1);
 
+        RemovePizzaMenuRequest restaurantNameRequest = new RemovePizzaMenuRequest();
+        restaurantNameRequest.setRestaurantName("chargiePizza");
+        restaurantNameRequest.setPizzaMenuName("BBQ Chicken Pizza.");
+        pizzaRestaurantService.removePizzaNameFromMenu(restaurantNameRequest);
 
-        PizzaRestaurantNameRequest restaurantNameRequest = new PizzaRestaurantNameRequest();
-        restaurantNameRequest.setPizzaRestaurantName("chargiePizza");
+        assertThat(pizzaMenuRepository.count(), is(1L));
 
 
     }
@@ -277,6 +285,7 @@ class PizzaRestaurantServiceImplTest {
 
 
 
+
     @Test
     public void testToUpdateMenu() {
 
@@ -294,7 +303,7 @@ class PizzaRestaurantServiceImplTest {
         updateRequest.setNewPizzaAmount(BigDecimal.valueOf(20));
         pizzaRestaurantService.updatePizzaMenu(updateRequest);
 
-        PizzaMenu updatedPizzaMenu = pizzaMenuService.findPizzaMenu("Margherita Pizza", getPizzaRestaurantForTest(updateRequest.getPizzaRestaurantName()));
+        PizzaMenu updatedPizzaMenu = pizzaMenuService.findPizzaMenu("Margherita Pizza",pizzaRestaurantService.getPizzaRestaurant(updateRequest.getPizzaRestaurantName()));
 
 
         assertNotNull(updatedPizzaMenu);
@@ -367,23 +376,23 @@ class PizzaRestaurantServiceImplTest {
 
     }
 
-    private PizzaRestaurant getPizzaRestaurantForTest(String restaurantName) {
-        Optional<PizzaRestaurant> pizzaRestaurantOptional = pizzaRestaurantRepository.findPizzaRestaurantByRestaurantNameIgnoreCase(restaurantName);
-        return pizzaRestaurantOptional.orElseThrow(() -> new RestaurantNotFoundException("Pizza Restaurant Not Found"));
-    }
 
 
-    @Test public void testThatPizzaRestaurantReceivedOrder(){
+    @Test
+    public void testThatPizzaRestaurantReceivedOrder(){
         AddMenuListRequest menuItem1 = new AddMenuListRequest();
         menuItem1.setPizzaRestaurantName("chargiePizza");
         menuItem1.setPizzaName("BBQ Chicken Pizza");
         menuItem1.setPizzaSize("Large");
+        menuItem1.setDrinkName("Coke");
+        menuItem1.setDrinkPrice(BigDecimal.valueOf(40));
         menuItem1.setPizzaAmount(BigDecimal.valueOf(10));
         pizzaRestaurantService.addPizzaMenu(menuItem1);
 
         CustomerRegisterUserRequest userRequest1 = new CustomerRegisterUserRequest();
         userRequest1.setCustomerEmail("Kevin@yahoo.com");
         userRequest1.setCustomerName("Kompany");
+        userRequest1.setCustomerPassword("Kompany");
         userRequest1.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
         userRequest1.setCustomerUserName("Kompany");
         customerService.registerCustomer(userRequest1);
@@ -391,8 +400,8 @@ class PizzaRestaurantServiceImplTest {
         OrderProductRequest orderProduct = new OrderProductRequest();
         orderProduct.setOrderName("order1");
         orderProduct.setCustomerName("Kompany");
-        orderProduct.setPizzaName("Margherita Pizza");
-        orderProduct.setPizzaSize("small");
+        orderProduct.setPizzaName("BBQ Chicken Pizza");
+        orderProduct.setPizzaSize("Large");
         orderProduct.setNumberOfPizza(3);
         orderProduct.setDrinks("Coke");
         orderProduct.setNumberOfDrinks(1);
@@ -403,11 +412,11 @@ class PizzaRestaurantServiceImplTest {
         checkRequest.setPiazzaRestaurant("chargiePizza");
         List<OrderMenu> orderMenuList = pizzaRestaurantService.checkOrderMenuList(checkRequest);
 
-        assertThat(orderMenuList.size(), is(1L));
+        assertThat(orderMenuList.size(), equalTo(1));
 
-
-
+        assertThat(orderMenuRepository.count(), is(1L));
 
 
     }
+
 }
