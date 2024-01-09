@@ -418,5 +418,19 @@ class PizzaRestaurantServiceImplTest {
 
 
     }
+    @Test
+    public void testPaymentOrder(){
+
+        AddMenuListRequest menuItem1 = new AddMenuListRequest();
+        menuItem1.setPizzaRestaurantName("chargiePizza");
+        menuItem1.setPizzaName("BBQ Chicken Pizza");
+        menuItem1.setPizzaSize("Large");
+        menuItem1.setDrinkName("Coke");
+        menuItem1.setDrinkPrice(BigDecimal.valueOf(40));
+        menuItem1.setPizzaAmount(BigDecimal.valueOf(10));
+        pizzaRestaurantService.addPizzaMenu(menuItem1);
+
+
+    }
 
 }

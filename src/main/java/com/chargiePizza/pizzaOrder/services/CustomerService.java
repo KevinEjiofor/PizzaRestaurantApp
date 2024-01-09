@@ -1,9 +1,8 @@
 package com.chargiePizza.pizzaOrder.services;
 
-import com.chargiePizza.pizzaOrder.dtos.CustomerRegisterUserRequest;
-import com.chargiePizza.pizzaOrder.dtos.LogInRequest;
-import com.chargiePizza.pizzaOrder.dtos.OrderProductRequest;
-import com.chargiePizza.pizzaOrder.dtos.RemoveOrderRequest;
+import com.chargiePizza.pizzaOrder.dtos.*;
+
+import java.math.BigDecimal;
 
 public interface CustomerService {
     void registerCustomer(CustomerRegisterUserRequest registerUserRequest);
@@ -15,4 +14,6 @@ public interface CustomerService {
     void addOrderProduct(OrderProductRequest orderProduct);
 
     void removeOrder(RemoveOrderRequest orderRequest);
+
+    BigDecimal payment(PaymentRequest paymentRequest);
 }

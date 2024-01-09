@@ -282,7 +282,40 @@ class CustomerServiceImplTest {
 
 
     }
+    @Test
+    public void testPayment(){
+        AddMenuListRequest menuList = new AddMenuListRequest();
+        menuList.setPizzaRestaurantName("chargiePizza");
+        menuList.setPizzaName("Margherita Pizza");
+        menuList.setPizzaSize("small");
+        menuList.setPizzaAmount(BigDecimal.valueOf(10));
+        menuList.setDrinkName("Coke");
+        menuList.setDrinkPrice(BigDecimal.valueOf(100));
+        pizzaRestaurantService.addPizzaMenu(menuList);
 
+        OrderProductRequest orderProduct = new OrderProductRequest();
+        orderProduct.setOrderName("Order1");
+        orderProduct.setPizzaRestaurantName("chargiePizza");
+        orderProduct.setCustomerName("EjiroKompany");
+        orderProduct.setPizzaName("Margherita Pizza");
+        orderProduct.setPizzaSize("small");
+        orderProduct.setNumberOfPizza(3);
+        orderProduct.setDrinks("Coke");
+        orderProduct.setNumberOfDrinks(1);
+
+        customerService.addOrderProduct(orderProduct);
+
+        assertThat(orderMenuRep.count(),is(1L));
+
+//        PaymentRequest payment = new PaymentRequest();
+//        payment.setCustomer("Ejiro Kompany");
+//
+//        payment.setAmountOfPizza();
+//        payment.s
+
+
+
+    }
 
 
 

@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @Document(collection = "orderMenu")
 public class OrderMenu {
@@ -17,20 +19,21 @@ public class OrderMenu {
     @DBRef
     private PizzaRestaurant pizzaRestaurant;
     private Payment orderId;
-    private String pizzaName;
+    @DBRef
+    private PizzaMenu pizza;
     private String pizzaSize;
     private int numberOfPizza;
-    private String drinks;
+//    private List<PizzaMenu> drinks;
     private int numberOfDrinks;
 
     @Override
     public String toString() {
         return "OrderMenu" +
                 "customerName: " + customerName +
-                "pizzaName: " + pizzaName + '\n' +
+                "pizzaName: " + pizza + '\n' +
                 "pizzaSize: " + pizzaSize + '\n' +
                 "numberOfPizza: " + numberOfPizza +
-                "drinks: " + drinks + '\n' +
+                "drinks: " + pizza.getDrinkName() + '\n' +
                 "numberOfDrinks: " + numberOfDrinks +'\n'+
                 '\n';
     }
