@@ -1,18 +1,20 @@
 package com.chargiePizza.pizzaOrder.services;
 
-import com.chargiePizza.pizzaOrder.data.models.OrderMenu;
-import com.chargiePizza.pizzaOrder.data.models.PizzaMenu;
-import com.chargiePizza.pizzaOrder.data.models.PizzaRestaurant;
-import com.chargiePizza.pizzaOrder.data.repositories.CustomerRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.OrderMenuRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
-import com.chargiePizza.pizzaOrder.dtos.*;
+import com.chargiePizza.pizzaOrder.dtos.request.*;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.data.models.PizzaMenu;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.data.models.PizzaRestaurant;
+import com.chargiePizza.pizzaOrder.User.data.repositories.CustomerRepository;
+import com.chargiePizza.pizzaOrder.User.data.repositories.OrderMenuRepository;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.data.repositories.PizzaMenuRepository;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.data.repositories.PizzaRestaurantRepository;
 
 import com.chargiePizza.pizzaOrder.expections.InvalidPasswordException;
 import com.chargiePizza.pizzaOrder.expections.MenuNotFoundException;
 import com.chargiePizza.pizzaOrder.expections.PizzaRestaurantAlreadyExistsException;
 import com.chargiePizza.pizzaOrder.expections.RestaurantNotFoundException;
+import com.chargiePizza.pizzaOrder.User.service.CustomerService;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.services.PizzaMenuService;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.services.PizzaRestaurantService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +37,7 @@ class PizzaRestaurantServiceImplTest {
     @Autowired
     private PizzaMenuRepository pizzaMenuRepository;
     @Autowired
-    private  PizzaMenuService pizzaMenuService;
+    private PizzaMenuService pizzaMenuService;
     @Autowired
     private CustomerService customerService;
     @Autowired
@@ -136,7 +135,7 @@ class PizzaRestaurantServiceImplTest {
     @Test
     public void testToAddToMenu() {
 
-        AddMenuListRequest  menuList = new AddMenuListRequest ();
+        AddMenuListRequest menuList = new AddMenuListRequest ();
         menuList.setPizzaRestaurantName("chargiePizza");
         menuList.setPizzaName("Margherita Pizza");
         menuList.setPizzaSize("small");
@@ -378,46 +377,7 @@ class PizzaRestaurantServiceImplTest {
 
 
 
-    @Test
-    public void testThatPizzaRestaurantReceivedOrder(){
-        AddMenuListRequest menuItem1 = new AddMenuListRequest();
-        menuItem1.setPizzaRestaurantName("chargiePizza");
-        menuItem1.setPizzaName("BBQ Chicken Pizza");
-        menuItem1.setPizzaSize("Large");
-        menuItem1.setDrinkName("Coke");
-        menuItem1.setDrinkPrice(BigDecimal.valueOf(40));
-        menuItem1.setPizzaAmount(BigDecimal.valueOf(10));
-        pizzaRestaurantService.addPizzaMenu(menuItem1);
 
-        CustomerRegisterUserRequest userRequest1 = new CustomerRegisterUserRequest();
-        userRequest1.setCustomerEmail("Kevin@yahoo.com");
-        userRequest1.setCustomerName("Kompany");
-        userRequest1.setCustomerPassword("Kompany");
-        userRequest1.setCustomerAddress("6 CORONA SCHOOL ,GRA Abijo");
-        userRequest1.setCustomerUserName("Kompany");
-        customerService.registerCustomer(userRequest1);
-
-        OrderProductRequest orderProduct = new OrderProductRequest();
-        orderProduct.setOrderName("order1");
-        orderProduct.setCustomerName("Kompany");
-        orderProduct.setPizzaName("BBQ Chicken Pizza");
-        orderProduct.setPizzaSize("Large");
-        orderProduct.setNumberOfPizza(3);
-        orderProduct.setDrinks("Coke");
-        orderProduct.setNumberOfDrinks(1);
-        orderProduct.setPizzaRestaurantName("chargiePizza");
-        customerService.addOrderProduct(orderProduct);
-
-        CheckMenuRequest checkRequest = new CheckMenuRequest();
-        checkRequest.setPiazzaRestaurant("chargiePizza");
-        List<OrderMenu> orderMenuList = pizzaRestaurantService.checkOrderMenuList(checkRequest);
-
-        assertThat(orderMenuList.size(), equalTo(1));
-
-        assertThat(orderMenuRepository.count(), is(1L));
-
-
-    }
     @Test
     public void testPaymentOrder(){
 

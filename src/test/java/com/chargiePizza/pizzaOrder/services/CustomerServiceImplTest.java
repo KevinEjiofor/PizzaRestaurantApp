@@ -4,20 +4,23 @@ package com.chargiePizza.pizzaOrder.services;
 
 import java.math.BigDecimal;
 
-import com.chargiePizza.pizzaOrder.data.repositories.OrderMenuRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.PizzaMenuRepository;
-import com.chargiePizza.pizzaOrder.data.repositories.PizzaRestaurantRepository;
-import com.chargiePizza.pizzaOrder.dtos.*;
+import com.chargiePizza.pizzaOrder.User.data.repositories.OrderMenuRepository;
+import com.chargiePizza.pizzaOrder.dtos.request.*;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.data.repositories.PizzaMenuRepository;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.data.repositories.PizzaRestaurantRepository;
 import com.chargiePizza.pizzaOrder.expections.MenuNotFoundException;
 
 
 
 
-import com.chargiePizza.pizzaOrder.data.models.Customer;
-import com.chargiePizza.pizzaOrder.data.repositories.CustomerRepository;
+import com.chargiePizza.pizzaOrder.User.data.models.Customer;
+import com.chargiePizza.pizzaOrder.User.data.repositories.CustomerRepository;
 import com.chargiePizza.pizzaOrder.expections.InvalidPasswordException;
 import com.chargiePizza.pizzaOrder.expections.UserAlreadyExistException;
 import com.chargiePizza.pizzaOrder.expections.UserDoesNotExistException;
+import com.chargiePizza.pizzaOrder.User.service.CustomerService;
+import com.chargiePizza.pizzaOrder.pizzaRestaurant.services.PizzaRestaurantService;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
