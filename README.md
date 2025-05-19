@@ -1,0 +1,3 @@
+escription: Developed a cutting-edge Pizza Restaurant Application, employing a robust layered architecture to ensure scalability and seamless integration of multiple pizza companies within a single platform. The app allows various pizza companies to showcase and sell their products concurrently, providing customers with a diverse selection and an enriched ordering experience.
+Backend Architecture: Implemented a payment API and RESTful API using Spring Boot framework for backend functionality,, task creation, and management.
+Technologies: Integrated MonogoDB database with Spring Boot backend to store task data securely and efficiently.
